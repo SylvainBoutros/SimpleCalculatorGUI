@@ -1,12 +1,13 @@
 # Import modules
 from tkinter import *
 from tkinter import ttk
+import math 
 
 buffer = 0
-first_number = 0
-second_number = 0
+first_operand = 0
+second_operand = 0
 running_total = 0
-first_number_set = False
+first_operand_set = False
 arithmetic_symbol_set = False
 digits_display_str = ""
 dot_set = False
@@ -25,39 +26,46 @@ def update_digit_display(num):
     global digits_display_str
     global running_total
     global dot_set
+    global first_operand 
+    global first_operand_set
 
     if (isinstance(num, int)):
-        if (num == -1):
+        if num == -1:
             running_total *= -1
             digits_display_str = str(running_total)
-        elif (num >= 0) and (dot_set is False):
+        elif num >= 0 and not dot_set:
             digits_display_str += str(num)
             running_total = int(digits_display_str)
-        else:
+        else:     
             digits_display_str += str(num)
-            tmp_str = digits_display_str.split(".")
-            try:
-                tmp_one = int(tmp_str[0])
-                tmp_two = float(tmp_str[1])
-            except ValueError:
-                print(f"{tmp_str} and {tmp_str[0]} and {tmp_str[1]} this")
-            
-            running_total = tmp_one + tmp_two
+            running_total = float(digits_display_str)  
     else:
-        if (dot_set is False) and (num == "dot"):
+        if not dot_set and num == "dot":
             digits_display_str += "."
-            tmp_str = digits_display_str.split(".")
-            try:
-                tmp_one = int(tmp_str[0])
-                tmp_two = float(tmp_str[1])
-            except ValueError:
-                print(f"{tmp_str} and {tmp_str[0]} and {tmp_str[1]} that")
-            
-            running_total = tmp_one + tmp_two            
+            running_total = float(digits_display_str)
             dot_set = True
+        elif (isinstance(num, list)):
+            if (running_total > 0):
+                if (num[0] == "sqrt"):
+                    running_total = math.sqrt(running_total)
+                elif num in ["mult", "div", "minus", "plus"] and not first_operand_set:
+                    first_operand = running_total
+                    first_operand = True
+                else:
+                    if (num[0] == "mult"):
+                        running_total *= first_operand
+                    elif (num[0] == "div") and (running_total != 0):
+                        running_total /= first_operand
+                    elif (num[0] == "minus"):
+                        running_total -= first_operand
+                    elif (num[0] == "plus"):
+                        running_total += first_operand
+                
+    if (len(str(running_total))>9):
+        digits_display_str = "{:.9g}".format(running_total)
 
-    digits_display_str = str(running_total)
     digit_display.config(text=digits_display_str)
+
 
 
 def clear_screen():
@@ -70,7 +78,7 @@ def clear_screen():
     global arithmetic_symbol_set
     global digits_display_str
     global dot_set
-    
+ 
     buffer = 0
     first_number = 0
     second_number = 0
@@ -115,7 +123,7 @@ btn_9.grid(column=2, row=1, sticky="nsew")
 btn_plus_minus = Button(main_frame, text="±", font=("Arial", 18), command=lambda: update_digit_display(-1))
 btn_plus_minus.grid(column=3, row=1, sticky="nsew")
 
-btn_sqrt = Button(main_frame, text="√", font=("Arial", 18), command=lambda: set_arithmetic("sqrt"))
+btn_sqrt = Button(main_frame, text="√", font=("Arial", 18), command=lambda: update_digit_display(["sqrt"]))
 btn_sqrt.grid(column=4, row=1, sticky="nsew")
 
 # Row 2 and Column 0 to 4 will be for 4, 5, 6, x, and /
@@ -128,10 +136,10 @@ btn_5.grid(column=1, row=2, sticky="nsew")
 btn_6 = Button(main_frame, text="6", font=("Arial", 18), command=lambda: update_digit_display(6))
 btn_6.grid(column=2, row=2, sticky="nsew")
 
-btn_mult = Button(main_frame, text="x", font=("Arial", 18), command=lambda: set_arithmetic("mult"))
+btn_mult = Button(main_frame, text="x", font=("Arial", 18), command=lambda: update_digit_display(["mult"]))
 btn_mult.grid(column=3, row=2, sticky="nsew")
 
-btn_div = Button(main_frame, text="÷", font=("Arial", 18), command=lambda: set_arithmetic("div"))
+btn_div = Button(main_frame, text="÷", font=("Arial", 18), command=lambda: update_digit_display(["div"]))
 btn_div.grid(column=4, row=2, sticky="nsew")
 
 # Row 3 and Column 0 to 3 will be for 1, 2, 3, and -
@@ -144,7 +152,7 @@ btn_2.grid(column=1, row=3, sticky="nsew")
 btn_3 = Button(main_frame, text="3", font=("Arial", 18), command=lambda: update_digit_display(3))
 btn_3.grid(column=2, row=3, sticky="nsew")
 
-btn_minus = Button(main_frame, text="-", font=("Arial", 18), command=lambda: set_arithmetic("minus"))
+btn_minus = Button(main_frame, text="-", font=("Arial", 18), command=lambda: update_digit_display(["minus"]))
 btn_minus.grid(column=3, row=3, sticky="nsew")
 
 # Row 4 and Column 0 to 3 will be for C, 0, ., and +
@@ -157,7 +165,7 @@ btn_0.grid(column=1, row=4, sticky="nsew")
 btn_dot = Button(main_frame, text=".", font=("Arial", 18), command=lambda: update_digit_display("dot"))
 btn_dot.grid(column=2, row=4, sticky="nsew")
 
-btn_plus = Button(main_frame, text="+", font=("Arial", 18), command=lambda: set_arithmetic("plus"))
+btn_plus = Button(main_frame, text="+", font=("Arial", 18), command=lambda: update_digit_display(["plus"]))
 btn_plus.grid(column=3, row=4, sticky="nsew")
 
 # Row 3 + 4 and Column 4 will be for =
