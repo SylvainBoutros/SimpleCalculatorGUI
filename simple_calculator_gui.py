@@ -72,6 +72,7 @@ def update_digit_display(num):
     if len(digits_display_str) > 9:
         digits_display_str = "{:.9g}".format(float(digits_display_str))
 
+    # Update the digit display with the new value of the digit display string
     digit_display.config(text=digits_display_str)
 
 
