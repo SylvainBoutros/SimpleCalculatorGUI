@@ -31,9 +31,9 @@ def is_float(digits_label):
 
 # Define a function that performs unary operations on the current operand
 def set_unary_op(op):
-    # Access the global variable for the digit display string
+    # Access the global variable for the digit display
     global digits_display_str
-    global dot_set 
+
     # Convert the digit display string to a Decimal object
     current_operand = Decimal(digits_display_str)
 
@@ -52,24 +52,25 @@ def set_unary_op(op):
     digit_display.config(text=digits_display_str)
 
 def update_digit_display(num):
-    global digits_display_str
-    global running_total
-    global dot_set
-    global first_operand 
-    global first_operand_set
+    global digits_display_str, dot_set
 
-    if not dot_set and num != "dot":
+    # If num is not a decimal point and there isn't already a decimal point in digits_display_str, append num to it
+    if num != "dot" and "." not in digits_display_str:
         digits_display_str += num
-    elif not dot_set and num == "dot":
+    # If num is a decimal point and there isn't already a decimal point in digits_display_str, append it to the string and set dot_set to True
+    elif num == "dot" and "." not in digits_display_str:
         digits_display_str += "."
         dot_set = True
-    elif dot_set and num != "dot":
+    # If num is not a decimal point and there is already a decimal point in digits_display_str, append num to it
+    elif num != "dot" and "." in digits_display_str:
         digits_display_str += num
+    # If num is a decimal point and there is already a decimal point in digits_display_str, do nothing
     else:
         pass
-                
-    if (len(digits_display_str)>9):
-        digits_display_str = "{:.9g}".format(digits_display_str)
+
+    # If digits_display_str is longer than 9 characters, format it to scientific notation with 9 significant figures
+    if len(digits_display_str) > 9:
+        digits_display_str = "{:.9g}".format(float(digits_display_str))
 
     digit_display.config(text=digits_display_str)
 
